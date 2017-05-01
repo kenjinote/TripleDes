@@ -19,7 +19,7 @@ BOOL Crypt3Des(BOOL bEnCryptOrDeCrypt, LPBYTE lpszText, DWORD dwTextSize, const 
 	if (!CryptHashData(hHash, lpszPassword, dwPasswordSize, 0)) goto END;
 	if (!CryptDeriveKey(hProv, CALG_3DES, hHash, 0, &hKey)) goto END;
 	if (bEnCryptOrDeCrypt) {
-		if (!CryptEncrypt(hKey,NULL,TRUE,0,lpszText,&dwTextSize, MAX_BUFFER)) goto END;
+		if (!CryptEncrypt(hKey, NULL, TRUE, 0, lpszText, &dwTextSize, MAX_BUFFER)) goto END;
 		CHAR hex_table[16] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' };
 		LPSTR pszTemp = (LPSTR)GlobalAlloc(0, dwTextSize * 2);
 		for (DWORD i = 0; i < dwTextSize; ++i) {
@@ -29,7 +29,8 @@ BOOL Crypt3Des(BOOL bEnCryptOrDeCrypt, LPBYTE lpszText, DWORD dwTextSize, const 
 		CopyMemory(lpszText, pszTemp, dwTextSize * 2);
 		lpszText[dwTextSize * 2] = 0;
 		GlobalFree(pszTemp);
-	} else {
+	}
+	else {
 		dwTextSize /= 2;
 		LPSTR pszTemp = (LPSTR)GlobalAlloc(0, dwTextSize);
 		for (DWORD i = 0; i < dwTextSize; ++i) {
@@ -43,13 +44,13 @@ BOOL Crypt3Des(BOOL bEnCryptOrDeCrypt, LPBYTE lpszText, DWORD dwTextSize, const 
 	}
 	bResult = TRUE;
 END:
-	if (hHash) {
-		CryptDestroyHash(hHash);
-		hHash = NULL;
-	} 
 	if (hKey) {
 		CryptDestroyKey(hKey);
 		hKey = NULL;
+	}
+	if (hHash) {
+		CryptDestroyHash(hHash);
+		hHash = NULL;
 	}
 	if (hProv) {
 		CryptReleaseContext(hProv, 0);
@@ -84,26 +85,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_COMMAND:
 		if (LOWORD(wParam) == 1000) {
 			const int nSize1 = GetWindowTextLengthA(hEdit1);
-			LPSTR lpszPassword = (LPSTR)GlobalAlloc(0, nSize1+1);
+			LPSTR lpszPassword = (LPSTR)GlobalAlloc(0, nSize1 + 1);
 			GetWindowTextA(hEdit1, lpszPassword, nSize1 + 1);
 			const int nSize2 = GetWindowTextLengthA(hEdit2);
 			LPSTR lpszText = (LPSTR)GlobalAlloc(0, MAX_BUFFER);
 			GetWindowTextA(hEdit2, lpszText, nSize2 + 1);
-			if (Crypt3Des(TRUE, (LPBYTE)lpszText, nSize2, (LPBYTE)lpszPassword, nSize1))
-			{
+			if (Crypt3Des(TRUE, (LPBYTE)lpszText, nSize2, (LPBYTE)lpszPassword, nSize1)) {
 				SetWindowTextA(hEdit3, lpszText);
 			}
 			GlobalFree(lpszPassword);
-			GlobalFree(lpszText);			
-		} else if (LOWORD(wParam) == 1001) {
+			GlobalFree(lpszText);
+		}
+		else if (LOWORD(wParam) == 1001) {
 			const int nSize1 = GetWindowTextLengthA(hEdit1);
-			LPSTR lpszPassword = (LPSTR)GlobalAlloc(0, nSize1+1);
+			LPSTR lpszPassword = (LPSTR)GlobalAlloc(0, nSize1 + 1);
 			GetWindowTextA(hEdit1, lpszPassword, nSize1 + 1);
 			const int nSize3 = GetWindowTextLengthA(hEdit3);
 			LPSTR lpszText = (LPSTR)GlobalAlloc(0, MAX_BUFFER);
 			GetWindowTextA(hEdit3, lpszText, nSize3 + 1);
-			if (Crypt3Des(FALSE, (LPBYTE)lpszText, nSize3, (LPBYTE)lpszPassword, nSize1))
-			{
+			if (Crypt3Des(FALSE, (LPBYTE)lpszText, nSize3, (LPBYTE)lpszPassword, nSize1)) {
 				SetWindowTextA(hEdit2, lpszText);
 			}
 			GlobalFree(lpszPassword);
